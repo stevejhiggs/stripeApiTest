@@ -1,0 +1,112 @@
+﻿@{
+	Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+	<meta name="viewport" content="width=device-width" />
+	<title>Index</title>
+
+	<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+	<script type="text/javascript">
+			Stripe.setPublishableKey('pk_test_tfslb2AIqTfdrkKE8fOYIIdQ');
+
+		   var stripeResponseHandler = function(status, response) {
+			 var $form = $('#payment-form');
+
+			 if (response.error) {
+			   // Show the errors on the form
+			   $form.find('.payment-errors').text(response.error.message);
+			 } else {
+				 $("#resToken").text(response.id);
+				 $("#resCardType").text(response.card.brand);
+				 $("#resLastFour").text(response.card.last4);
+			 }
+		   };
+
+		   jQuery(function($) {
+		       $('#tokenise-form').submit(function (e) {
+			   var $form = $(this);
+			   Stripe.card.createToken($form, stripeResponseHandler);
+			   return false;
+			 });
+
+			 $('#customer-form').submit(function (e) {
+				 var $form = $(this);
+				 
+				 $.ajax({
+					 type: "POST",
+					 url: '/api/stripe/createcustomer',
+					 data: $("#customer-form").serialize(),
+					 success: function (data) {
+						 $("#custToken").text(data);
+					 }
+				 });
+				 
+				 return false;
+			 });
+
+			 $('#payment-form').submit(function (e) {
+				 var $form = $(this);
+
+				 $.ajax({
+					 type: "POST",
+					 url: '/api/stripe/makepayment',
+					 data: $("#payment-form").serialize(),
+					 success: function (data) {
+						 $("#paymentRef").text(data);
+					 }
+				 });
+
+				 return false;
+			 });
+		   });
+	</script>
+</head>
+<body>
+	<h2>Step 1 - use stripe.js to create a card token</h2>
+	<form action="" method="POST" id="tokenise-form">
+		<!-- Add a section to display errors if you want -->
+		<span class='payment-errors'></span>
+		<input placeholder="number" data-stripe="number" />
+		<input placeholder="cv2" data-stripe="cvc" />
+		<input placeholder="expMonth" data-stripe="exp-month" />
+		<input placeholder="expYear" data-stripe="exp-year" />
+		<button type="submit">Create card token</button>
+	</form>
+
+	<h3>result</h3>
+	<ul>
+		<li>one time card token: <span id="resToken"></span></li>
+		<li>card type: <span id="resCardType"></span></li>
+		<li>last4: <span id="resLastFour"></span></li>
+	</ul>
+
+	<h2>Step 2 - call server side to create a customer object from the token</h2>
+	<form action="" method="POST" id="customer-form">
+		<input placeholder="one time card token" name="cardToken" />
+		<button type="submit">Create Customer</button>
+	</form>
+
+	<h3>result</h3>
+	<ul>
+		<li>multiple use customer token: <span id="custToken"></span></li>
+	</ul>
+
+	<h2>Step 3 - use customer id to make as many payments as you like</h2>
+	<form action="" method="POST" id="payment-form">
+		<input placeholder="customer token" name="customerToken" />
+		<input placeholder="amount" name="amount" />
+		<button type="submit">make payment</button>
+	</form>
+
+	<h3>result</h3>
+	<ul>
+		<li>ref: <span id="paymentRef"></span></li>
+	</ul>
+</body>
+</html>
