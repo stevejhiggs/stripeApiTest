@@ -46,11 +46,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="RestSharp">
-      <HintPath>..\packages\RestSharp.104.4.0\lib\net4\RestSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Stripe">
-      <HintPath>..\packages\Stripe.1.11.0\lib\net40\Stripe.dll</HintPath>
+    <Reference Include="Stripe.net">
+      <HintPath>..\packages\Stripe.net.2.2.6\lib\net40\Stripe.net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

@@ -23,19 +23,34 @@ namespace StripeApi.Controllers.Api
 
     public class StripeController : ApiController
     {
-        private string stripeMerchantSecretKey = "sk_test_mhw8Qvphf7iYcUnj3XrVWMky";
+        private string stripeMerchantSecretKey = "sk_test_Ahrg1aEm1EVK6UnSMOivorLG";
 
         [HttpPost]
         [Route("api/stripe/createcustomer")]
         public string CreateCustomerObject(CustomerObjectRequest cardTokenRequest)
         {
-            var api = new StripeClient(stripeMerchantSecretKey);
-            //var card = new 
-            dynamic result = api.CreateCustomer(new Stripe.CreditCardToken(cardTokenRequest.CardToken));
-            if (!result.IsError)
+            var customerCreateOptions = new StripeCustomerCreateOptions();
+            customerCreateOptions.TokenId = cardTokenRequest.CardToken;
+
+            //these are all optional
+            customerCreateOptions.Email = "test@opentable.com";
+            customerCreateOptions.Description = "I am a tasty customer";
+            var metaData = new Dictionary<string, string>();
+            metaData.Add("opentableId", "123456");
+            customerCreateOptions.Metadata = metaData;
+
+            var customerService = new StripeCustomerService(stripeMerchantSecretKey);
+            try
             {
-                return result.Id;
+                StripeCustomer createdCustomer = customerService.Create(customerCreateOptions);
+                return createdCustomer.Id;
             }
+            catch(StripeException sx)
+            {
+                //do some logging
+                
+            }
+
             return "";
         }
 
@@ -43,13 +58,29 @@ namespace StripeApi.Controllers.Api
         [Route("api/stripe/makepayment")]
         public string MakePayment(PaymentRequest paymentRequest)
         {
-            var api = new StripeClient(stripeMerchantSecretKey);
-            //var card = new 
-            dynamic result = api.CreateCharge(paymentRequest.Amount, "GBP", paymentRequest.CustomerToken, "Its for sundries and arbitrary bribes");
-            if (!result.IsError && result.Paid)
+            var chargeOptions = new StripeChargeCreateOptions();
+            chargeOptions.Amount = (int)(paymentRequest.Amount * 100);
+            chargeOptions.Currency = "GBP";
+            chargeOptions.CustomerId = paymentRequest.CustomerToken;
+
+            //optional properties
+            chargeOptions.Description = "tasty meal";
+            var metaData = new Dictionary<string, string>();
+            metaData.Add("opentableBookingId", "998998924");
+            chargeOptions.Metadata= metaData;
+
+            var chargeService = new StripeChargeService(stripeMerchantSecretKey);
+
+            try
             {
-                return result.Id;
+                StripeCharge stripeCharge = chargeService.Create(chargeOptions);
+                return stripeCharge.Id;
             }
+            catch (StripeException sx)
+            {
+                //do some logging
+            }
+
             return "";
         }
     }

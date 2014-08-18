@@ -13,7 +13,7 @@
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
 	<script type="text/javascript">
-			Stripe.setPublishableKey('pk_test_tfslb2AIqTfdrkKE8fOYIIdQ');
+			Stripe.setPublishableKey('pk_test_yYwBZ1oPLXjxZwZZOBDGJle7');
 
 		   var stripeResponseHandler = function(status, response) {
 			 var $form = $('#payment-form');
@@ -29,7 +29,7 @@
 		   };
 
 		   jQuery(function($) {
-		       $('#tokenise-form').submit(function (e) {
+			   $('#tokenise-form').submit(function (e) {
 			   var $form = $(this);
 			   Stripe.card.createToken($form, stripeResponseHandler);
 			   return false;
