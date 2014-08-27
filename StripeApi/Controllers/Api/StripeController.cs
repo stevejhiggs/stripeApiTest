@@ -8,8 +8,6 @@ using System.Web.Http;
 
 namespace StripeApi.Controllers.Api
 {
-    
-
     public class CustomerObjectRequest
     {
         public string CardToken { get; set; }
@@ -17,6 +15,7 @@ namespace StripeApi.Controllers.Api
 
     public class PaymentRequest
     {
+        public string MerchantToken { get; set; }
         public string CustomerToken { get; set; }
         public decimal Amount { get; set; }
     }
@@ -57,10 +56,19 @@ namespace StripeApi.Controllers.Api
         [Route("api/stripe/makepayment")]
         public string MakePayment(PaymentRequest paymentRequest)
         {
+            //can't use a customer from the shared opentable account directly, need to create a one off token first
+            var tokenOptions = new StripeTokenCreateOptions();
+            tokenOptions.CustomerId = paymentRequest.CustomerToken;
+
+            var tokenService = new StripeTokenService(paymentRequest.MerchantToken);
+            StripeToken stripeToken = tokenService.Create(tokenOptions);
+
+            //use the token to create the charge
             var chargeOptions = new StripeChargeCreateOptions();
             chargeOptions.Amount = (int)(paymentRequest.Amount * 100);
             chargeOptions.Currency = "GBP";
-            chargeOptions.CustomerId = paymentRequest.CustomerToken;
+            chargeOptions.TokenId = stripeToken.Id;
+
 
             //optional properties
             chargeOptions.Description = "tasty meal";
@@ -68,7 +76,7 @@ namespace StripeApi.Controllers.Api
             metaData.Add("opentableBookingId", "998998924");
             chargeOptions.Metadata= metaData;
 
-            var chargeService = new StripeChargeService(ConfigurationManager.AppSettings["masterMerchantSecretkey"]);
+            var chargeService = new StripeChargeService(paymentRequest.MerchantToken);
 
             try
             {

@@ -2,6 +2,8 @@
 	Layout = null;
 }
 
+@model StripeApi.Controllers.IndexResponseViewModel
+
 <!DOCTYPE html>
 
 <html>
@@ -68,47 +70,52 @@
 	</script>
 </head>
 <body>
-	<h2>Step 1 - connect your stripe account to the master account</h2>
-
-	<h2>Step 1 - use stripe.js to create a card token</h2>
-	<form action="" method="POST" id="tokenise-form">
-		<!-- Add a section to display errors if you want -->
-		<span class='payment-errors'></span>
-		<input placeholder="number" data-stripe="number" />
-		<input placeholder="cv2" data-stripe="cvc" />
-		<input placeholder="expMonth" data-stripe="exp-month" />
-		<input placeholder="expYear" data-stripe="exp-year" />
-		<button type="submit">Create card token</button>
-	</form>
-
-	<h3>result</h3>
+	<h2>Step 1 - connect the restauarant stripe account to the master opentable account</h2>
+    <a href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_4fOi1tBfJPGeIusUQ4YOBq1bZcQuV9TZ&scope=read_write&stripe_landing=login">connect to stripe</a>
 	<ul>
-		<li>one time card token: <span id="resToken"></span></li>
-		<li>card type: <span id="resCardType"></span></li>
-		<li>last4: <span id="resLastFour"></span></li>
+		<li>restaurant access token: <span id="merchantToken">@Model.MerchantToken</span></li>
 	</ul>
 
-	<h2>Step 2 - call server side to create a customer object from the token</h2>
-	<form action="" method="POST" id="customer-form">
-		<input placeholder="one time card token" name="cardToken" />
-		<button type="submit">Create Customer</button>
-	</form>
+		<h2>Step 2 - use stripe.js to create a card token using the master opentable account</h2>
+		<form action="" method="POST" id="tokenise-form">
+			<!-- Add a section to display errors if you want -->
+			<span class='payment-errors'></span>
+			<input placeholder="number" data-stripe="number" />
+			<input placeholder="cv2" data-stripe="cvc" />
+			<input placeholder="expMonth" data-stripe="exp-month" />
+			<input placeholder="expYear" data-stripe="exp-year" />
+			<button type="submit">Create card token</button>
+		</form>
 
-	<h3>result</h3>
-	<ul>
-		<li>multiple use customer token: <span id="custToken"></span></li>
-	</ul>
+		<h3>result</h3>
+		<ul>
+			<li>one time card token: <span id="resToken"></span></li>
+			<li>card type: <span id="resCardType"></span></li>
+			<li>last4: <span id="resLastFour"></span></li>
+		</ul>
 
-	<h2>Step 3 - use customer id to make as many payments as you like</h2>
-	<form action="" method="POST" id="payment-form">
-		<input placeholder="customer token" name="customerToken" />
-		<input placeholder="amount" name="amount" />
-		<button type="submit">make payment</button>
-	</form>
+		<h2>Step 2 - call server side to create a customer object from the token</h2>
+		<form action="" method="POST" id="customer-form">
+			<input placeholder="one time card token" name="cardToken" />
+			<button type="submit">Create Customer</button>
+		</form>
 
-	<h3>result</h3>
-	<ul>
-		<li>ref: <span id="paymentRef"></span></li>
-	</ul>
+		<h3>result</h3>
+		<ul>
+			<li>multiple use customer token: <span id="custToken"></span></li>
+		</ul>
+
+		<h2>Step 3 - use customer id to make as many payments as you like</h2>
+		<form action="" method="POST" id="payment-form">
+			<input placeholder="restaurant access token" name="merchantToken" />
+			<input placeholder="customer token" name="customerToken" />
+			<input placeholder="amount" name="amount" />
+			<button type="submit">make payment</button>
+		</form>
+
+		<h3>result</h3>
+		<ul>
+			<li>ref: <span id="paymentRef"></span></li>
+		</ul>
 </body>
 </html>
