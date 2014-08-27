@@ -1,6 +1,7 @@
 ﻿using Stripe;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -23,8 +24,6 @@ namespace StripeApi.Controllers.Api
 
     public class StripeController : ApiController
     {
-        private string stripeMerchantSecretKey = "sk_test_Ahrg1aEm1EVK6UnSMOivorLG";
-
         [HttpPost]
         [Route("api/stripe/createcustomer")]
         public string CreateCustomerObject(CustomerObjectRequest cardTokenRequest)
@@ -39,7 +38,7 @@ namespace StripeApi.Controllers.Api
             metaData.Add("opentableId", "123456");
             customerCreateOptions.Metadata = metaData;
 
-            var customerService = new StripeCustomerService(stripeMerchantSecretKey);
+            var customerService = new StripeCustomerService(ConfigurationManager.AppSettings["masterMerchantSecretkey"]);
             try
             {
                 StripeCustomer createdCustomer = customerService.Create(customerCreateOptions);
@@ -69,7 +68,7 @@ namespace StripeApi.Controllers.Api
             metaData.Add("opentableBookingId", "998998924");
             chargeOptions.Metadata= metaData;
 
-            var chargeService = new StripeChargeService(stripeMerchantSecretKey);
+            var chargeService = new StripeChargeService(ConfigurationManager.AppSettings["masterMerchantSecretkey"]);
 
             try
             {

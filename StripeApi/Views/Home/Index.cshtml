@@ -13,7 +13,7 @@
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
 	<script type="text/javascript">
-			Stripe.setPublishableKey('pk_test_yYwBZ1oPLXjxZwZZOBDGJle7');
+			Stripe.setPublishableKey('@System.Configuration.ConfigurationManager.AppSettings["masterMerchantPublishablekey"]');
 
 		   var stripeResponseHandler = function(status, response) {
 			 var $form = $('#payment-form');
@@ -68,6 +68,8 @@
 	</script>
 </head>
 <body>
+	<h2>Step 1 - connect your stripe account to the master account</h2>
+
 	<h2>Step 1 - use stripe.js to create a card token</h2>
 	<form action="" method="POST" id="tokenise-form">
 		<!-- Add a section to display errors if you want -->
